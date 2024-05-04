@@ -24,6 +24,7 @@ void printPlayer(int nextY);
 void jump(int *ch, int y);
 void printObstacle(int nextX, int nextY);
 void groundInit(int y);
+int collision(int x,int y,int obstacleX,int obstacleY);
 
 int main()
 {
@@ -159,7 +160,9 @@ int main()
                 printObstacle(newObstacleX, obstacleY);
             }
 
-            
+            if (collision(x, y, obstacleX, obstacleY) == 1){
+                break;
+            }
 
             screenUpdate();
         }
@@ -219,5 +222,13 @@ void groundInit(int y) {
                 }
             }
         }
+    }
+}
+
+int collision(int x,int y,int obstacleX,int obstacleY){
+    if (x == obstacleX && y == obstacleY){
+        return 1;
+    }else{
+        return 0;
     }
 }
