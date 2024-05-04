@@ -14,10 +14,11 @@
 #include "./logo.h"
 
 int x = 25, y = 19;
-int obstacleX = 30, obstacleY = 2;
+int obstacleX = 77, obstacleY = 19;
 float velocidadeX = 1, incY = 1;
 float obstacleIncY = 1;
-int gravity = 1;
+float obstacleIncX = -1;
+float gravity = 1;
 
 void printPlayer(int nextY);
 void jump(int *ch, int y);
@@ -149,13 +150,16 @@ int main()
             //     ch = 0;
             // }
 
-            int newObstacleY = obstacleIncY + obstacleY;
-            if (newObstacleY >= MAXY - 1 || newObstacleY <= MINY + 1)
+            int newObstacleX = obstacleIncX + obstacleX;
+            if (newObstacleX < MINX + 2)
             {
-                obstacleIncY = -obstacleIncY;
+                screenGotoxy(newObstacleX, obstacleY);
+                printf("     ");
+            }else{
+                printObstacle(newObstacleX, obstacleY);
             }
 
-            printObstacle(obstacleX, newObstacleY);
+            
 
             screenUpdate();
         }
@@ -183,9 +187,9 @@ void jump(int *ch, int y) {
         printPlayer(y + gravity);
     }
     if (*ch == 32 && y == 19) {
-        int newPlayerY = y - 4;
+        int newPlayerY = y - 6;
         *ch = 0;
-        printPlayer(newPlayerY);
+        printPlayer(newPlayerY + gravity);
     }
 }
 
