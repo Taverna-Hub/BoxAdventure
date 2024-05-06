@@ -166,7 +166,7 @@ int main()
 
             screenUpdate();
         }
-    }
+    } 
 
     keyboardDestroy();
     screenDestroy();
