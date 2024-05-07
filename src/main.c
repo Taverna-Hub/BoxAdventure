@@ -19,12 +19,17 @@ float velocidadeX = 1, incY = 1;
 float obstacleIncY = 1;
 float obstacleIncX = -1;
 float gravity = 1;
+float blockIncX = -1;
+float blockX = 60, blockY = 19;
+float pastY;
 
 void printPlayer(int nextY);
 void jump(int *ch, int y);
 void printObstacle(int nextX, int nextY);
 void groundInit(int y);
-int collision(int x,int y,int obstacleX,int obstacleY);
+int collisionObstacle(int x,int y,int obstacleX,int obstacleY);
+int collisionBlock(int x, int y, int blockX, int blockY);
+void printBlock(int nextX, int blockX);
 
 int main()
 {
@@ -43,7 +48,7 @@ int main()
 
 
     screenInit(1);
-    timerInit(50);
+    timerInit(80);
 
     printObstacle(obstacleX, obstacleY);
     groundInit(20);
@@ -70,7 +75,7 @@ int main()
         printf("  Kills: ");
 
         screenSetColor(CYAN, DARKGRAY);
-        // Update game state (move elements, verify collision, etc)
+        // Update game state (move elements, verify collisionObstacle, etc)
         if (timerTimeOver() == 1)
         {
             printPlayer(y);
@@ -160,10 +165,28 @@ int main()
                 printObstacle(newObstacleX, obstacleY);
             }
 
-            if (collision(x, y, obstacleX, obstacleY) == 1){
+            if (collisionObstacle(x, y, obstacleX, obstacleY) == 1){
                 break;
             }
 
+            if (collisionBlock(x, y, blockX, blockY) == 1 && y != pastY && blockX == x){
+                y == 18;
+                printPlayer(y);
+            } else if (collisionBlock(x, y, blockX, blockY) == 1){
+                break;
+            }
+
+
+            int newBlockX = blockIncX + blockX;
+            if (newBlockX < MINX + 2)
+            {
+                screenGotoxy(newBlockX, blockY);
+                printf("     ");
+            }else{
+                printBlock(newBlockX, blockY);
+            }
+
+            pastY = y;
             screenUpdate();
         }
     } 
@@ -189,7 +212,7 @@ void jump(int *ch, int y) {
     if (y < 19) {
         printPlayer(y + gravity);
     }
-    if (*ch == 32 && y == 19) {
+    if (*ch == 32 && (y == 19 || y == 18)) {
         int newPlayerY = y - 6;
         *ch = 0;
         printPlayer(newPlayerY + gravity);
@@ -225,10 +248,27 @@ void groundInit(int y) {
     }
 }
 
-int collision(int x,int y,int obstacleX,int obstacleY){
+int collisionObstacle(int x,int y,int obstacleX,int obstacleY){
     if (x == obstacleX && y == obstacleY){
         return 1;
     }else{
         return 0;
     }
+}
+
+int collisionBlock(int x,int y,int blockX,int blockY){
+    if (x == blockX && y == blockY){
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+void printBlock(int nextX, int nextY){
+    screenGotoxy(blockX, blockY);
+    printf(" ");
+    blockX = nextX;
+    blockY = nextY;
+    screenGotoxy(blockX, blockY);
+    printf("⬜");
 }
