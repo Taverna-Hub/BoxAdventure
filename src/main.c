@@ -7,6 +7,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "screen.h"
 #include "keyboard.h"
@@ -29,7 +30,6 @@ void physics(int y);
 void printObstacle(int nextX, int nextY);
 void groundInit(int y);
 int collisionObstacle(int x,int y,int obstacleX,int obstacleY);
-int collisionBlock(int x, int y, int blockX, int blockY);
 void printBlock(int nextX, int blockX);
 
 int main()
@@ -176,19 +176,21 @@ int main()
                 break;
             }
 
-            if (collisionBlock(x, y, blockX, blockY) == 1 && y != pastY && blockX == x){
-                y == 18;
+            if (collisionObstacle(x, y, blockX, blockY) == 1 && y != pastY && x == blockX){
+                y = blockY - 1;
                 printPlayer(y);
-            } else if (collisionBlock(x, y, blockX, blockY) == 1){
+            } else if (collisionObstacle(x, y, blockX, blockY) == 1){
                 break;
             }
 
 
             int newBlockX = blockIncX + blockX;
-            if (newBlockX < MINX + 2)
+            if (newBlockX < MINX + 1)
             {
-                screenGotoxy(newBlockX, blockY);
-                printf("     ");
+                blockX = 77;
+                blockY = 19;
+                screenGotoxy(blockX, blockY);
+                printBlock(blockX, blockY);
             }else{
                 printBlock(newBlockX, blockY);
             }
@@ -261,14 +263,6 @@ void groundInit(int y) {
 
 int collisionObstacle(int x,int y,int obstacleX,int obstacleY){
     if (x == obstacleX && y == obstacleY){
-        return 1;
-    }else{
-        return 0;
-    }
-}
-
-int collisionBlock(int x,int y,int blockX,int blockY){
-    if (x == blockX && y == blockY){
         return 1;
     }else{
         return 0;
