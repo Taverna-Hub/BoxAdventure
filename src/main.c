@@ -19,13 +19,13 @@ int obstacleX = 77, obstacleY = 19;
 float velocidadeX = 1, incY = 1;
 float obstacleIncY = 1;
 float obstacleIncX = -1;
-float gravity = 1.5;
+float gravity = 1;
 float blockIncX = -1;
 float blockX = 60, blockY = 19;
 float pastY;
 
 void printPlayer(int nextY);
-void physics(int *ch, int y);
+void physics(int y);
 void printObstacle(int nextX, int nextY);
 void groundInit(int y);
 int collisionObstacle(int x,int y,int obstacleX,int obstacleY);
@@ -49,7 +49,7 @@ int main()
 
 
     screenInit(1);
-    timerInit(80);
+    timerInit(40);
 
     printObstacle(obstacleX, obstacleY);
     groundInit(20);
@@ -89,7 +89,8 @@ int main()
             if (ch == 32 && yChange == 0) {
                 yChange = 3;
             }
-            physics(ch, y);
+            ch = 0;
+            physics(y);
 
             // if (ch == 100)
             // {
@@ -161,10 +162,12 @@ int main()
             // }
 
             int newObstacleX = obstacleIncX + obstacleX;
-            if (newObstacleX < MINX + 2)
+            if (newObstacleX < MINX + 1)
             {
-                screenGotoxy(newObstacleX, obstacleY);
-                printf("     ");
+                obstacleX = 77;
+                obstacleY = 19;
+                screenGotoxy(obstacleX, obstacleY);
+                printObstacle(obstacleX, obstacleY);
             }else{
                 printObstacle(newObstacleX, obstacleY);
             }
@@ -212,11 +215,7 @@ void printPlayer(int nextY)
     printf("🔵");
 }
 
-void physics(int *ch, int y) {
-    if (y == 19 && yChange < 0)
-    {
-        yChange = 0;
-    }
+void physics(int y) {
     if (yChange > 0 || y < 19){
         y -= yChange;
         yChange -= gravity;
@@ -224,6 +223,10 @@ void physics(int *ch, int y) {
     }
     if (y > 19) {
         printPlayer(19);
+    }
+    if (y == 19 && yChange < 0)
+    {
+        yChange = 0;
     }
 }
 
