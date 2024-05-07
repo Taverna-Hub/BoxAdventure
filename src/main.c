@@ -15,6 +15,7 @@
 #include "./logo.h"
 
 int x = 25, y = 19;
+int score = 0, kills = 0, scoreCounter = 0;
 int yChange = 0;
 int obstacleX = 77, obstacleY = 19;
 int bossX = 78;
@@ -81,6 +82,11 @@ int main()
         {
             printPlayer(y);
 
+            screenGotoxy(MINX + 10, MINY + 2);
+            printf("%d", score);
+            screenGotoxy(MINX +10, MINX + 3);
+            printf("%d", kills);
+
             if (y > 19)
             {
                 y = 19;
@@ -96,10 +102,13 @@ int main()
             int newObstacleX = obstacleIncX + obstacleX;
             if (newObstacleX < MINX + 1)
             {
+                screenGotoxy(obstacleX, obstacleY);
+                printf("    ");
                 obstacleX = 77;
                 obstacleY = 19;
                 screenGotoxy(obstacleX, obstacleY);
                 printObstacle(obstacleX, obstacleY);
+              // scoreCounter = 0;
             }else{
                 printObstacle(newObstacleX, obstacleY);
             }
@@ -119,10 +128,13 @@ int main()
             int newBlockX = blockIncX + blockX;
             if (newBlockX < MINX + 1)
             {
+                screenGotoxy(blockX, blockY);
+                printf("    ");
                 blockX = 77;
                 blockY = 19;
                 screenGotoxy(blockX, blockY);
                 printBlock(blockX, blockY);
+                scoreCounter = 0;            
             }else{
                 printBlock(newBlockX, blockY);
             }
@@ -175,6 +187,12 @@ void printObstacle(int nextX, int nextY)
     obstacleY = nextY;
     screenGotoxy(obstacleX, obstacleY);
     printf("🔥");
+    /* if (obstacleX <= x){
+        if (scoreCounter != 1){
+            score++;
+            scoreCounter += 1;
+        }
+    } */
 }
 
 void groundInit(int y) {
@@ -212,6 +230,13 @@ void printBlock(int nextX, int nextY){
     screenGotoxy(blockX, blockY);
     if (nextX <= x) {
         printf("🟥");
+        if (scoreCounter != 1){
+            score++;
+            if (y = blockY -1){
+                kills++;
+            }
+            scoreCounter += 1;
+        }
     } else {
         printf("⬜");
     }
