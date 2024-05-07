@@ -16,6 +16,7 @@
 int x = 25, y = 19;
 int yChange = 0;
 int obstacleX = 77, obstacleY = 19;
+int bossX = 78;
 float velocidadeX = 1, incY = 1;
 float obstacleIncY = 1;
 float obstacleIncX = -1;
@@ -31,6 +32,7 @@ void groundInit(int y);
 int collisionObstacle(int x,int y,int obstacleX,int obstacleY);
 int collisionBlock(int x, int y, int blockX, int blockY);
 void printBlock(int nextX, int blockX);
+void printBoss(int xis);
 
 int main()
 {
@@ -47,7 +49,6 @@ int main()
     }
     ch = 0;
 
-
     screenInit(1);
     timerInit(40);
 
@@ -58,7 +59,7 @@ int main()
 
     screenUpdate();
 
-    while (ch != 10) // enter
+    while (ch != 10)
     {
 
         if (keyhit()) 
@@ -67,16 +68,15 @@ int main()
             screenUpdate();
         }
 
-
-        screenSetColor(GREEN, WHITE);
+        screenSetColor(GREEN, DARKGRAY);
         screenGotoxy(MINX + 1, MINY + 2);
         printf("  Score: ");
-        screenSetColor(RED, WHITE);
+        screenSetColor(RED, DARKGRAY);
         screenGotoxy(MINX + 1, MINY + 3);
         printf("  Kills: ");
 
-        screenSetColor(CYAN, WHITE);
-        // Update game state (move elements, verify collisionObstacle, etc)
+        screenSetColor(CYAN, DARKGRAY);
+
         if (timerTimeOver() == 1)
         {
             printPlayer(y);
@@ -90,76 +90,8 @@ int main()
                 yChange = 3;
             }
             ch = 0;
+
             physics(y);
-
-            // if (ch == 100)
-            // {
-            //     int newHelloX = x + velocidadeX;
-            //     if (newHelloX <= (MAXX - strlen("Hello World") - 1))
-            //     {
-            //         velocidadeX = 1;
-            //     }
-
-            //     if (newHelloX >= (MAXX - strlen("Hello World") - 1))
-            //     {
-            //         velocidadeX = 0;
-            //     }
-            //     ch = 0;
-
-            //     printHello(newHelloX, y);
-            // }
-
-            // if (ch == 97)
-            // {
-            //     int newHelloX = x - velocidadeX;
-
-            //     if (!(newHelloX <= MINX + 1))
-            //     {
-            //         velocidadeX = 1;
-            //     }
-            //     if (newHelloX <= MINX + 1)
-            //     {
-            //         velocidadeX = 0;
-            //     }
-
-            //     printHello(newHelloX, y);
-            //     ch = 0;
-            // }
-
-            // if (ch == 119)
-            // {
-
-            //     int newY = y - incY;
-
-            //     if (newY <= MAXY + 1)
-            //     {
-            //         incY = 1;
-            //     }
-            //     if (newY >= MAXY + 1)
-            //     {
-            //         incY = 0;
-            //     }
-
-            //     printHello(x, newY);
-            //     ch = 0;
-            // }
-
-            // if (ch == 115)
-            // {
-
-            //     int newY = y + incY;
-            //     if (newY <= MINY - 1)
-            //     {
-            //         incY = 0;
-            //     }
-            //     if (newY >= MINY - 1)
-            //     {
-            //         incY = 1;
-            //     }
-
-            //     printHello(x, newY);
-            //     ch = 0;
-            // }
 
             int newObstacleX = obstacleIncX + obstacleX;
             if (newObstacleX < MINX + 1)
@@ -192,6 +124,9 @@ int main()
             }else{
                 printBlock(newBlockX, blockY);
             }
+
+            /* printBoss(bossX);
+            bossX--; */
 
             pastY = y;
             screenUpdate();
@@ -245,10 +180,10 @@ void groundInit(int y) {
         for (int i = 2; i < 79; i++) {
             screenGotoxy(i, j);
             if (j == y) {
-                screenSetColor(LIGHTGREEN, WHITE);
+                screenSetColor(LIGHTGREEN, DARKGRAY);
                 printf("T");
             } else {
-                screenSetColor(BLACK, WHITE);
+                screenSetColor(BLACK, DARKGRAY);
                 if (i % 2 == 0) {
                     printf("/");
                 } else {
@@ -281,5 +216,22 @@ void printBlock(int nextX, int nextY){
     blockX = nextX;
     blockY = nextY;
     screenGotoxy(blockX, blockY);
-    printf("⬜");
+    if (nextX <= x) {
+        printf("🟥");
+    } else {
+        printf("⬜");
+    }
+    
+}
+
+void printBoss(int xis) {
+    for (int j = 19; j > MINY+3; j--) {
+        for (int i = xis; i < 79; i++) {
+            if (i >= 50) {
+                screenGotoxy(i, j);
+                screenSetColor(WHITE, DARKGRAY);
+                printf("#");
+            }
+        }
+    }
 }
