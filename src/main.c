@@ -14,17 +14,18 @@
 #include "./logo.h"
 
 int x = 25, y = 19;
+int yChange = 0;
 int obstacleX = 77, obstacleY = 19;
 float velocidadeX = 1, incY = 1;
 float obstacleIncY = 1;
 float obstacleIncX = -1;
-float gravity = 1;
+float gravity = 1.5;
 float blockIncX = -1;
 float blockX = 60, blockY = 19;
 float pastY;
 
 void printPlayer(int nextY);
-void jump(int *ch, int y);
+void physics(int *ch, int y);
 void printObstacle(int nextX, int nextY);
 void groundInit(int y);
 int collisionObstacle(int x,int y,int obstacleX,int obstacleY);
@@ -67,14 +68,14 @@ int main()
         }
 
 
-        screenSetColor(GREEN, DARKGRAY);
+        screenSetColor(GREEN, WHITE);
         screenGotoxy(MINX + 1, MINY + 2);
         printf("  Score: ");
-        screenSetColor(RED, DARKGRAY);
+        screenSetColor(RED, WHITE);
         screenGotoxy(MINX + 1, MINY + 3);
         printf("  Kills: ");
 
-        screenSetColor(CYAN, DARKGRAY);
+        screenSetColor(CYAN, WHITE);
         // Update game state (move elements, verify collisionObstacle, etc)
         if (timerTimeOver() == 1)
         {
@@ -85,7 +86,10 @@ int main()
                 y = 19;
             }
 
-            jump(&ch, y);
+            if (ch == 32 && yChange == 0) {
+                yChange = 3;
+            }
+            physics(ch, y);
 
             // if (ch == 100)
             // {
@@ -208,14 +212,18 @@ void printPlayer(int nextY)
     printf("🔵");
 }
 
-void jump(int *ch, int y) {
-    if (y < 19) {
-        printPlayer(y + gravity);
+void physics(int *ch, int y) {
+    if (y == 19 && yChange < 0)
+    {
+        yChange = 0;
     }
-    if (*ch == 32 && (y == 19 || y == 18)) {
-        int newPlayerY = y - 6;
-        *ch = 0;
-        printPlayer(newPlayerY + gravity);
+    if (yChange > 0 || y < 19){
+        y -= yChange;
+        yChange -= gravity;
+        printPlayer(y);
+    }
+    if (y > 19) {
+        printPlayer(19);
     }
 }
 
@@ -234,10 +242,10 @@ void groundInit(int y) {
         for (int i = 2; i < 79; i++) {
             screenGotoxy(i, j);
             if (j == y) {
-                screenSetColor(LIGHTGREEN, DARKGRAY);
+                screenSetColor(LIGHTGREEN, WHITE);
                 printf("T");
             } else {
-                screenSetColor(BLACK, DARKGRAY);
+                screenSetColor(BLACK, WHITE);
                 if (i % 2 == 0) {
                     printf("/");
                 } else {
