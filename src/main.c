@@ -18,7 +18,7 @@ struct element {
     int x;
     int y;
     int velX;
-    int morto;
+    int is_dead;
 };
 
 int bossX = 78;
@@ -26,6 +26,7 @@ int velY = 0;
 int score = 0, kills = 0, scoreCounter = 0;
 float gravity = 1;
 float pastY;
+int frame = 1;
 
 void groundInit(int y);
 void physics(int y, struct element * player);
@@ -79,14 +80,14 @@ int main()
 
     struct element * box[2];
 
-    int initialBoxX = 75;
+    int initialBoxX = 70;
 
     for (int i = 0; i < 2; i++) {
         box[i] = (struct element *)malloc(sizeof(struct element));
         box[i]->x = initialBoxX;
         box[i]->y = 19;
         box[i]->velX = -1;
-        obstacle[i]->morto = 0;
+        obstacle[i]->is_dead = 0;
         initialBoxX -= 10;
     }
 
@@ -146,8 +147,8 @@ int main()
             int newObstacleX = obstacle[0]->x + obstacle[0]->velX;
             if (newObstacleX < MINX + 2)
             {   
-                screenGotoxy(obstacle[0]->x, obstacle[0]->x);
-                printf("    ");
+                screenGotoxy(obstacle[0]->x, obstacle[0]->y);
+                printf("     ");
                 obstacle[0]->x = 77;
                 screenGotoxy(obstacle[0]->x, obstacle[0]->y);
                 printObstacle(obstacle[0]->x, obstacle[0]->y, obstacle[0]);
@@ -177,10 +178,18 @@ int main()
                 printBox(newBoxX, box[0]->y, box[0], player);
             }
 
-            if (kills >= 10) {
-                printBoss(bossX);
-                bossX--;
-                player->x = 32;
+            if (kills >= 20) {
+                if (player->x <= 32) {
+                    player->x = player->x + 1;
+                    printPlayer(player->y, player);
+                    frame++;
+                }
+                printMessage(kills);
+                if (frame >= 7) {
+                    printBoss(bossX);
+                    bossX--;
+                }
+
                 for (int i = 0; i < 5; i++) {
                     screenGotoxy(25, 19-i);
                     printf(" ");
@@ -292,11 +301,11 @@ void printBox(int nextX, int nextY, struct element * box, struct element * playe
     screenGotoxy(box->x, box->y);
     if (nextX <= player->x) {
         printf("🟥");
-        if (box->morto == 0) {
+        if (box->is_dead == 0) {
             score++;
             kills++;
             scoreCounter += 1;
-            box->morto = 1;
+            box->is_dead = 1;
         }
     } else {
         screenGotoxy(box->x, box->y-2);
@@ -305,7 +314,7 @@ void printBox(int nextX, int nextY, struct element * box, struct element * playe
         screenGotoxy(box->x, box->y);
         printf("⬜");
         screenSetColor(CYAN, DARKGRAY);
-        box->morto = 0;
+        box->is_dead = 0;
 
     }
     
