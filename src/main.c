@@ -137,7 +137,7 @@ int main()
             }
 
             /* JUMP */
-            if (ch == 32 && velY == 0) {
+            if (ch == 32 && velY == 0 && player->y == 19) {
                 velY = 3;
             }
             ch = 0;
