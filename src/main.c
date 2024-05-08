@@ -19,6 +19,8 @@ struct element {
     int y;
     int velX;
     int is_dead;
+    int lives;
+    int lifePiece;
 };
 
 int bossX = 78;
@@ -65,6 +67,8 @@ int main()
     player->x = 25;
     player->y = 19;
     player->velX = 1;
+    player->lives = 1;
+    player->lifePiece = 0;
     
     struct element * obstacle[3];
 
@@ -80,12 +84,12 @@ int main()
 
     struct element * box[2];
 
-    int initialBoxX = 70;
+    int initialBoxX = 55;
 
     for (int i = 0; i < 2; i++) {
         box[i] = (struct element *)malloc(sizeof(struct element));
         box[i]->x = initialBoxX;
-        box[i]->y = 19;
+        box[i]->y = 16;
         box[i]->velX = -1;
         obstacle[i]->is_dead = 0;
         initialBoxX -= 10;
@@ -117,6 +121,7 @@ int main()
         {
             groundInit(20);
 
+            screenSetColor(CYAN, DARKGRAY);
             screenGotoxy(MINX + 10, MINY + 2);
             printf("%d", score);
             if (kills > 0) {
@@ -125,8 +130,16 @@ int main()
                 printf("  Kills: ");
                 printMessage(kills);
                 screenSetColor(CYAN, DARKGRAY);
-                screenGotoxy(MINX + 10, MINX + 3);
+                screenGotoxy(MINX + 10, MINY + 3);
                 printf("%d", kills);
+            }
+            screenGotoxy(MINX + 1, MINY + 4);
+            printf("  Lives: ");
+            screenGotoxy(MINX + 10, MINY + 4);
+            printf("                      ");
+            for (int i = 0;i < player->lives; i++){
+                screenGotoxy(MINX + (10 + i), MINY + 4);
+                printf("🔵⚫⚫");
             }
 
             printPlayer(player->y, player);
@@ -160,11 +173,9 @@ int main()
             if (collisionElement(player->x, player->y, obstacle[0]->x, obstacle[0]->y) == 1){
                 screenGotoxy(MINX + 15, MINY + 2);
                 break;
+                // lives--;
             }
 
-            /* if (collisionElement(player->x, player->y, box[0]->x, box[0]->y) == 1 && player->x != pastY && box[0]->x == player->x){
-                printPlayer(player->y, player);
-            } */
 
             int newBoxX = box[0]->x + box[0]->velX;
             if (newBoxX < MINX + 2)
@@ -176,6 +187,15 @@ int main()
                 printBox(box[0]->x, box[0]->y, box[0], player);
             }else{
                 printBox(newBoxX, box[0]->y, box[0], player);
+            }
+
+            if (collisionElement(player->x, player->y, box[0]->x, box[0]->y) == 1){
+                player->lifePiece++;
+            }
+
+            if (player->lifePiece == 5){
+                player->lives++;
+                player->lifePiece = 0;
             }
 
             if (kills >= 20) {
@@ -335,7 +355,7 @@ void printBoss(int xis) {
 void printMessage(int kills) {
     screenGotoxy(MINX + 18, MINY + 10);
     //AJEITAR COMO APAGA AS MENSAGENS
-    printf("                                      ");
+    printf("                                  ");
     if (kills < 10) {
         screenGotoxy(MINX+18, MINY+10);
         screenSetColor(RED, DARKGRAY);
