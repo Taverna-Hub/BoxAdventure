@@ -30,9 +30,10 @@ int score = 0, kills = 0, scoreCounter = 0;
 float gravity = 1;
 float pastY;
 int frame = 1;
+int lastRound = 0;
 
 
-void groundInit(int y);
+void groundInit(int y, int stop);
 void physics(int y, struct element * player);
 
 void printBox(int nextX, int nextY, struct element * box, struct element * player);
@@ -43,6 +44,7 @@ void printMessage(int kills);
 void printLives(int lives);
 
 int collisionElement(int x, int y, int obstacleX, int obstacleY);
+int collisionBox(int x, int y, int obstacleX, int obstacleY);
 
 struct element * createElement();
 
@@ -133,27 +135,38 @@ int main()
             screenUpdate();
         }
 
-        screenSetColor(GREEN, DARKGRAY);
-        screenGotoxy(MINX + 1, MINY + 2);
-        printf("  Score: ");
-
         screenSetColor(CYAN, DARKGRAY);
 
         if (timerTimeOver() == 1)
         {
-            groundInit(20);
+            groundInit(20, 0);
 
-            screenSetColor(CYAN, DARKGRAY);
-            screenGotoxy(MINX + 10, MINY + 2);
-            printf("%d", score);
-            if (kills > 0) {
-                screenSetColor(RED, DARKGRAY);
-                screenGotoxy(MINX + 1, MINY + 3);
-                printf("  Kills: ");
-                printMessage(kills);
+            if (player->lives >= 1) {
+                screenSetColor(GREEN, DARKGRAY);
+                screenGotoxy(MINX + 1, MINY + 2);
+                printf("  Score: ");
                 screenSetColor(CYAN, DARKGRAY);
+                screenGotoxy(MINX + 10, MINY + 2);
+                printf("%d", score);
+                if (kills > 0) {
+                    screenSetColor(RED, DARKGRAY);
+                    screenGotoxy(MINX + 1, MINY + 3);
+                    printf("  Kills: ");
+                    printMessage(kills);
+                    screenSetColor(CYAN, DARKGRAY);
+                    screenGotoxy(MINX + 10, MINY + 3);
+                    printf("%d", kills);
+                }
+            } else if (player->lives < 1){
+                screenGotoxy(MINX + 1, MINY + 2);
+                printf("                                                                               ");
+                screenGotoxy(MINX + 10, MINY + 2);
+                printf("                                                                               ");
+                screenGotoxy(MINX + 1, MINY + 3);
+                printf("                                                                               ");
                 screenGotoxy(MINX + 10, MINY + 3);
-                printf("%d", kills);
+                printf("                                                                               ");
+
             }
 
             printLives(player->lives);
@@ -189,16 +202,31 @@ int main()
 
             // Player loses lives or end game for loses lives
             if (collisionElement(player->x, player->y, obstacle[0]->x, obstacle[0]->y)){
-                if (player->lives <= 1) {
+                if (player->lives <= 1 ) {
                     
-                    screenGotoxy(MINX + 15, MINY + 2);
+                    groundInit(20, 1);
 
-                    printf("Voce perdeu ahahahaha");
+                    screenGotoxy(MINX + 1, MINY + 2);
+                    printf("                                                                               ");
+                    screenGotoxy(MINX + 10, MINY + 2);
+                    printf("                                                                               ");
+                    screenGotoxy(MINX + 1, MINY + 3);
+                    printf("                                                                               ");
+                    screenGotoxy(MINX + 10, MINY + 3);
+                    printf("                                                                               ");
+                
+                    screenGotoxy(MINX + 15, MINY + 2);
+                    screenSetColor(RED, DARKGRAY);
+                    printf("GAME OVER");
 
                     while (ch != 10) {
-                         if (keyhit()) { break;}
+                        if (keyhit()) { break;}
                     }
-                    break;
+                    if (lastRound == 0) {
+                        lastRound = 1;
+                    } else if (lastRound == 1) {
+                        break;
+                    }
                 } else {
                     player->lives--;
                 }
@@ -314,20 +342,29 @@ void printObstacle(int nextX, int nextY, struct element * obstacle)
     } */
 }
 
-void groundInit(int y) {
-    for (int j = y; j < MAXY; j++) {
-        for (int i = 2; i < 79; i++) {
-            screenGotoxy(i, j);
-            if (j == y) {
-                screenSetColor(LIGHTGREEN, DARKGRAY);
-                printf("T");
-            } else {
-                screenSetColor(BLACK, DARKGRAY);
-                if (i % 2 == 0) {
-                    printf("/");
+void groundInit(int y, int stop) {
+    if (stop == 0) {
+        for (int j = y; j < MAXY; j++) {
+            for (int i = 2; i < 79; i++) {
+                screenGotoxy(i, j);
+                if (j == y) {
+                    screenSetColor(LIGHTGREEN, DARKGRAY);
+                    printf("T");
                 } else {
-                    printf("|");
+                    screenSetColor(BLACK, DARKGRAY);
+                    if (i % 2 == 0) {
+                        printf("/");
+                    } else {
+                        printf("|");
+                    }
                 }
+            }
+        }
+    } else {
+        for (int j = y; j < MAXY; j++) {
+            for (int i = 2; i < 79; i++) {
+                screenGotoxy(i, j);
+                printf(" ");
             }
         }
     }
@@ -335,6 +372,14 @@ void groundInit(int y) {
 
 int collisionElement(int x, int y, int obstacleX, int obstacleY){
     if (x == obstacleX && y == obstacleY ){
+        return 1;
+    }else{
+        return 0;
+    }
+}
+
+int collisionBox(int x, int y, int boxX, int boxY){
+    if ((x == boxX || x == boxX+1 || x == boxX-1 || x == boxX+2 || x == boxX-2) && y == boxY ){
         return 1;
     }else{
         return 0;
@@ -351,7 +396,7 @@ void printBox(int nextX, int nextY, struct element * box, struct element * playe
     box->y = nextY;
 
     screenGotoxy(box->x, box->y);
-    if (nextX <= player->x && collisionElement(player->x, player->y, box->x, box->y-2)) {
+    if (nextX <= player->x && collisionBox(player->x, player->y, box->x, box->y-2) == 1) {
         printf("🟥");
         if (box->is_dead == 0) {
             score++;
