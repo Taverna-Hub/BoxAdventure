@@ -14,6 +14,7 @@
 #include "timer.h"
 #include "./logo.h"
 
+#define KILLS_LIMIT 2-
 struct element {
     int x;
     int y;
@@ -31,6 +32,7 @@ float gravity = 1;
 float pastY;
 int frame = 1;
 int lastRound = 0;
+int phase = 1;
 
 
 void groundInit(int y, int stop);
@@ -67,6 +69,8 @@ struct element* createElement() {
 int main()
 {   
     static int ch = 0;
+    
+    screenHideCursor();
 
     keyboardInit();
 
@@ -186,17 +190,32 @@ int main()
 
             physics(player->y, player);
 
-            int newObstacleX = obstacle[0]->x + obstacle[0]->velX;
-            if (newObstacleX < MINX + 2)
-            {   
-                screenGotoxy(obstacle[0]->x, obstacle[0]->y);
-                printf("     ");
-                obstacle[0]->x = 77;
-                screenGotoxy(obstacle[0]->x, obstacle[0]->y);
-                printObstacle(obstacle[0]->x, obstacle[0]->y, obstacle[0]);
-                // scoreCounter = 0;
+            if (phase == 1){
+                int newObstacleX = obstacle[0]->x + obstacle[0]->velX;
+                if (newObstacleX < MINX + 2)
+                {   
+                    screenGotoxy(obstacle[0]->x, obstacle[0]->y);
+                    printf("     ");
+                    obstacle[0]->x = 77;
+                    screenGotoxy(obstacle[0]->x, obstacle[0]->y);
+                    printObstacle(obstacle[0]->x, obstacle[0]->y, obstacle[0]);
+                    // scoreCounter = 0;
+                } else {
+                    printObstacle(newObstacleX, obstacle[0]->y, obstacle[0]);
+                }
             } else {
-                printObstacle(newObstacleX, obstacle[0]->y, obstacle[0]);
+                int newObstacleX = MINX - obstacle[0]->velX;
+                if (newObstacleX < MAXX + 2)
+                {   
+                    screenGotoxy(obstacle[0]->x, obstacle[0]->y);
+                    printf("     ");
+                    obstacle[0]->x = 1;
+                    screenGotoxy(obstacle[0]->x, obstacle[0]->y);
+                    printObstacle(obstacle[0]->x, obstacle[0]->y, obstacle[0]);
+                    // scoreCounter = 0;
+                } else {
+                    printObstacle(newObstacleX, obstacle[0]->y, obstacle[0]);
+                }
             }
 
 
@@ -231,20 +250,37 @@ int main()
                     player->lives--;
                 }
             }
+            if (phase == 1){
 
-            int newBoxX = box[0]->x + box[0]->velX;
-            if (newBoxX < MINX + 2)
-            {
-                screenGotoxy(newBoxX, box[0]->y);
-                printf("     ");
-                screenGotoxy(newBoxX, box[0]->y-2);
-                printf("     ");
-                box[0]->x = 77;
-                box[0]->is_dead = 0;
-                screenGotoxy(box[0]->x, box[0]->y);
-                printBox(box[0]->x, box[0]->y, box[0], player);
-            }else{
-                printBox(newBoxX, box[0]->y, box[0], player);
+                int newBoxX = box[0]->x + box[0]->velX;
+                if (newBoxX < MINX + 2)
+                {
+                    screenGotoxy(newBoxX, box[0]->y);
+                    printf("     ");
+                    screenGotoxy(newBoxX, box[0]->y-2);
+                    printf("     ");
+                    box[0]->x = 77;
+                    box[0]->is_dead = 0;
+                    screenGotoxy(box[0]->x, box[0]->y);   
+                    printBox(box[0]->x, box[0]->y, box[0], player);
+                }else{
+                    printBox(newBoxX, box[0]->y, box[0], player);
+                }
+            } else {
+                int newBoxX = (MINX + 2) - box[0]->velX;
+                if (newBoxX < MAXX + 2)
+                {
+                    screenGotoxy(newBoxX, box[0]->y);
+                    printf("     ");
+                    screenGotoxy(newBoxX, box[0]->y-2);
+                    printf("     ");
+                    box[0]->x = 1;
+                    box[0]->is_dead = 0;
+                    screenGotoxy(box[0]->x, box[0]->y);
+                    printBox(box[0]->x, box[0]->y, box[0], player);
+                }else{
+                    printBox(newBoxX, box[0]->y, box[0], player);
+                }
             }
 
             if (collisionElement(player->x, player->y, box[0]->x, box[0]->y) == 1){
@@ -256,11 +292,12 @@ int main()
                 player->lifePiece = 0;
             }
 
-            if (kills >= 20) {
+            if (kills >= KILLS_LIMIT) {
                 if (player->x <= 32) {
                     player->x = player->x + 1;
                     printPlayer(player->y, player);
                     frame++;
+                    phase++;
                 }
 
                 
