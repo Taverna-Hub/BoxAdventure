@@ -14,7 +14,7 @@
 #include "timer.h"
 #include "./logo.h"
 
-#define KILLS_LIMIT 2-
+#define KILLS_LIMIT 2
 struct element {
     int x;
     int y;
@@ -69,14 +69,18 @@ struct element* createElement() {
 int main()
 {   
     static int ch = 0;
+
+    screenInit(0);
     
     screenHideCursor();
 
     keyboardInit();
 
     system("clear");
-
+    screenSetColor(CYAN, DARKGRAY);
     printf("%s\n", logo);
+    screenSetColor(YELLOW, DARKGRAY);
+    printf("%s\n", start);
 
     while (ch != 32) {
         if (keyhit())
