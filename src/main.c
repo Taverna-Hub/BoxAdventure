@@ -14,7 +14,7 @@
 #include "timer.h"
 #include "./logo.h"
 
-#define KILLS_LIMIT 2
+#define KILLS_LIMIT 10
 struct element {
     int x;
     int y;
@@ -43,6 +43,7 @@ void printObstacle(int nextY, int nextX, struct element * obstacle);
 void printBoss(int xis);
 void printMessage(int kills);
 void printLives(int lives);
+void printLifePiece(int lifePiece);
 
 int collisionElement(int x, int y, int obstacleX, int obstacleY);
 int collisionBox(int x, int y, int obstacleX, int obstacleY);
@@ -173,6 +174,7 @@ int main()
             }
 
             printLives(player->lives);
+            printLifePiece(player->lifePiece);
             
             printPlayer(player->y, player);
 
@@ -283,11 +285,13 @@ int main()
             }
 
             if (player->x == obstacle[0]->x && player->y != obstacle[0]->y){
-                score++;
+                score+=100;
             }
 
             if (collisionElement(player->x, player->y, box[0]->x, box[0]->y) == 1){
-                player->lifePiece++;
+                if (box[0]->is_dead == 1){
+                    player->lifePiece++;
+                }
             }
 
             if (player->lifePiece == 5){
@@ -441,7 +445,7 @@ void printBox(int nextX, int nextY, struct element * box, struct element * playe
             score++;
             kills++;
             if (player->lives < 3) {
-                player->lives++;
+                player->lifePiece++;
             }  
             scoreCounter += 1;
             box->is_dead = 1;
@@ -502,4 +506,12 @@ void printLives(int lives) {
     for (int i = 1;i < 4; i++){
         printf("%s", (i <=lives) ? "🔵" : "⚫");
     }
+}
+
+void printLifePiece(int lifePiece){
+    screenGotoxy(MINX + 1, MINY + 5);
+    screenSetColor(MAGENTA, DARKGRAY);
+    printf("  Life Pieces: ");
+    screenGotoxy(MINX + 16, MINY + 5);
+    printf("%d / 5", lifePiece);
 }
