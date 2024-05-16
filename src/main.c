@@ -33,7 +33,6 @@ int frame = 1;
 int lastRound = 0;
 int phase = 1;
 
-
 void groundInit(int y, int stop);
 void physics(int y, struct element * player);
 
@@ -44,8 +43,8 @@ void printBoss(int xis);
 void printMessage(int kills);
 void printLives(int lives);
 void printLifePiece(int lifePiece);
-void boxSpawn();
-void obstacleSpawn();
+void obstacleSpawn(int phase, struct element *obstacle);
+void boxSpawn(int phase, struct element *box, struct element *player);
 
 int collisionElement(int x, int y, int obstacleX, int obstacleY);
 int collisionBox(int x, int y, int obstacleX, int obstacleY);
@@ -194,7 +193,7 @@ int main()
             physics(player->y, player);
 
             // Spawn e movimentação de obstáculos e caixas
-            obstacleSpawn(phase, obstacle[0], player);
+            obstacleSpawn(phase, obstacle[0]);
             boxSpawn(phase, box[0], player);
 
             // Player perde vida ou acaba o jogo se perder todas vidas
@@ -390,7 +389,7 @@ void printBox(int nextX, int nextY, struct element * box, struct element * playe
             box->is_dead = 1;
         }
     } else{
-        if (box->is_dead != 1) {
+        if (box->is_dead != 1 && kills < 1) {
             screenGotoxy(box->x, box->y-2);
             screenSetColor(GREEN, DARKGRAY);
             printf("v");
@@ -473,24 +472,24 @@ void boxSpawn (int phase, struct element *box, struct element *player){
             printBox(newBoxX, box->y, box, player);
         }
         } else {
-            int newBoxX = (MINX + 2) - box->velX;
-            if (newBoxX < MAXX + 2)
+            box->x = box->x + (box->velX)*(-1);
+            if (box->x > 50)
         {
-            screenGotoxy(newBoxX, box->y);
-            printf("     ");
-            screenGotoxy(newBoxX, box->y-2);
-            printf("     ");
-            box->x = 1;
+            screenGotoxy(box->x, box->y);
+            printf("      ");
+            screenGotoxy(box->x, box->y-2);
+            printf("      ");
+            box->x = 2;
             box->is_dead = 0;
             screenGotoxy(box->x, box->y);
             printBox(box->x, box->y, box, player);
         } else {
-           printBox(newBoxX, box->y, box, player);
+           printBox(box->x, box->y, box, player);
         }
     }
 }
 
-void obstacleSpawn(int phase, struct element *obstacle, struct element *player){
+void obstacleSpawn(int phase, struct element *obstacle){
     if (phase == 1){
                 int newObstacleX = obstacle->x + obstacle->velX;
                 if (newObstacleX < MINX + 2)
@@ -504,16 +503,16 @@ void obstacleSpawn(int phase, struct element *obstacle, struct element *player){
                     printObstacle(newObstacleX, obstacle->y, obstacle);
                 }
             } else {
-                int newObstacleX = MINX - obstacle->velX;
-                if (newObstacleX < MAXX + 2)
+                obstacle->x = obstacle->x + (obstacle->velX)*(-1);
+                if (obstacle->x > 50)
                 {   
                     screenGotoxy(obstacle->x, obstacle->y);
                     printf("     ");
-                    obstacle->x = 1;
+                    obstacle->x = 2;
                     screenGotoxy(obstacle->x, obstacle->y);
                     printObstacle(obstacle->x, obstacle->y, obstacle);
                 } else {
-                    printObstacle(newObstacleX, obstacle->y, obstacle);
+                    printObstacle(obstacle->x, obstacle->y, obstacle);
                 }
             }
 }
