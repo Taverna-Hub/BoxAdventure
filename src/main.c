@@ -14,7 +14,7 @@
 #include "timer.h"
 #include "./logo.h"
 
-#define KILLS_LIMIT 2-
+#define KILLS_LIMIT 2
 struct element {
     int x;
     int y;
@@ -29,7 +29,6 @@ int bossX = 78;
 int velY = 0;
 int score = 0, kills = 0, scoreCounter = 0;
 float gravity = 1;
-float pastY;
 int frame = 1;
 int lastRound = 0;
 int phase = 1;
@@ -219,7 +218,7 @@ int main()
             }
 
 
-            // Player loses lives or end game for loses lives
+            // Player loses lives or end game if loses lives
             if (collisionElement(player->x, player->y, obstacle[0]->x, obstacle[0]->y)){
                 if (player->lives <= 1 ) {
                     
@@ -283,6 +282,10 @@ int main()
                 }
             }
 
+            if (player->x == obstacle[0]->x && player->y != obstacle[0]->y){
+                score++;
+            }
+
             if (collisionElement(player->x, player->y, box[0]->x, box[0]->y) == 1){
                 player->lifePiece++;
             }
@@ -313,7 +316,6 @@ int main()
                 }
             }
 
-            pastY = player->y;
             screenUpdate();
         }
     } 
