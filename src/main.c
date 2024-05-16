@@ -14,7 +14,7 @@
 #include "timer.h"
 #include "./logo.h"
 
-#define KILLS_LIMIT 2-
+#define KILLS_LIMIT 2
 struct element {
     int x;
     int y;
