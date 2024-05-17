@@ -14,14 +14,15 @@
 #include "timer.h"
 #include "./logo.h"
 
-#define KILLS_LIMIT 2
+#define KILLS_LIMIT 50
 struct element {
     int x;
     int y;
-    int velX;
+    float velX;
     int colision;
     int is_dead;
     int lives;
+    int side;
     int lifePiece;
 };
 
@@ -30,6 +31,7 @@ int velY = 0;
 int score = 0, kills = 0, scoreCounter = 0;
 float gravity = 1;
 int frame = 1;
+int frameBox = 1;
 int lastRound = 0;
 int phase = 1;
 
@@ -93,7 +95,7 @@ int main()
 
     screenInit(1);
 
-    timerInit(40);
+    timerInit(50);
 
     struct element * player = createElement();
     player->x = 25;
@@ -124,6 +126,7 @@ int main()
         box[i]->x = initialBoxX;
         box[i]->y = 16;
         box[i]->velX = -1;
+        box[i]->side = 0;
         obstacle[i]->is_dead = 0;
         initialBoxX -= 10;
     }
@@ -137,6 +140,27 @@ int main()
 
     while (ch != 10)
     {
+        if (score >= 10000) {
+            if (phase > 1) {
+                box[0]->velX = 2;
+                obstacle[0]->velX = 2;
+                obstacle[1]->velX = 2;
+            } else {
+                box[0]->velX = -2;
+                obstacle[0]->velX = -2;
+                obstacle[1]->velX = -2;
+            }
+        } else if (score >= 5000) {
+            if (phase > 1) {
+                box[0]->velX = 1.05;
+                obstacle[0]->velX = 1.05;
+                obstacle[1]->velX = 1.05;
+            } else {
+                box[0]->velX = -1.05;
+                obstacle[0]->velX = -1.05;
+                obstacle[1]->velX = -1.05;
+            }
+        } 
 
         if (keyhit()) 
         {
@@ -147,7 +171,7 @@ int main()
         screenSetColor(CYAN, DARKGRAY);
 
         if (timerTimeOver() == 1)
-        {
+        {   
             groundInit(20, 0);
 
             if (player->lives >= 1) {
@@ -198,7 +222,79 @@ int main()
 
             // Spawn e movimentação de obstáculos e caixas
             obstacleSpawn(phase, obstacle[0]);
+            if (score >= 2000) {
+                obstacleSpawn(phase, obstacle[1]);
+            }
+            if (score >= 10000) {
+                obstacleSpawn(phase, obstacle[2]);
+            }
             boxSpawn(phase, box[0], player);
+
+
+            if (score >= 2000) {
+                if (collisionElement(player->x, player->y, obstacle[1]->x, obstacle[1]->y)){
+                if (player->lives <= 1 ) {
+                    
+                    groundInit(20, 1);
+
+                    screenGotoxy(MINX + 1, MINY + 2);
+                    printf("                                                                               ");
+                    screenGotoxy(MINX + 10, MINY + 2);
+                    printf("                                                                               ");
+                    screenGotoxy(MINX + 1, MINY + 3);
+                    printf("                                                                               ");
+                    screenGotoxy(MINX + 10, MINY + 3);
+                    printf("                                                                               ");
+                
+                    screenGotoxy(MINX + 15, MINY + 2);
+                    screenSetColor(RED, DARKGRAY);
+                    printf("GAME OVER");
+
+                    while (ch != 10) {
+                        if (keyhit()) { break;}
+                    }
+                    if (lastRound == 0) {
+                        lastRound = 1;
+                    } else if (lastRound == 1) {
+                        break;
+                    }
+                } else {
+                    player->lives--;
+                }
+            }
+            }
+            if (score >= 10000) {
+                if (collisionElement(player->x, player->y, obstacle[2]->x, obstacle[2]->y)){
+                if (player->lives <= 1 ) {
+                    
+                    groundInit(20, 1);
+
+                    screenGotoxy(MINX + 1, MINY + 2);
+                    printf("                                                                               ");
+                    screenGotoxy(MINX + 10, MINY + 2);
+                    printf("                                                                               ");
+                    screenGotoxy(MINX + 1, MINY + 3);
+                    printf("                                                                               ");
+                    screenGotoxy(MINX + 10, MINY + 3);
+                    printf("                                                                               ");
+                
+                    screenGotoxy(MINX + 15, MINY + 2);
+                    screenSetColor(RED, DARKGRAY);
+                    printf("GAME OVER");
+
+                    while (ch != 10) {
+                        if (keyhit()) { break;}
+                    }
+                    if (lastRound == 0) {
+                        lastRound = 1;
+                    } else if (lastRound == 1) {
+                        break;
+                    }
+                } else {
+                    player->lives--;
+                }
+            }
+            }
 
             // Player perde vida ou acaba o jogo se perder todas vidas
             if (collisionElement(player->x, player->y, obstacle[0]->x, obstacle[0]->y)){
@@ -236,6 +332,17 @@ int main()
                 score+=100;
             }
 
+            if (score >= 2000) {
+                if (player->x == obstacle[1]->x && player->y != obstacle[1]->y){
+                    score+=100;
+                }
+            }
+            if (score >= 10000) {
+                if (player->x == obstacle[2]->x && player->y != obstacle[2]->y){
+                    score+=100;
+                }
+            }
+
             if (collisionElement(player->x, player->y, box[0]->x, box[0]->y) == 1){
                 if (box[0]->is_dead == 1){
                     player->lifePiece++;
@@ -255,17 +362,16 @@ int main()
                     phase++;
                 }
 
-                
                 printMessage(kills);
                 if (frame >= 7) {
                     printBoss(bossX);
                     bossX--;
                 }
 
-                for (int i = 0; i < 5; i++) {
+                /* for (int i = 0; i < 5; i++) {
                     screenGotoxy(25, 19-i);
                     printf(" ");
-                }
+                } */
             }
 
             screenUpdate();
@@ -356,6 +462,11 @@ void groundInit(int y, int stop) {
 }
 
 int collisionElement(int x, int y, int obstacleX, int obstacleY){
+    if (score >= 1500) {
+        if (x == obstacleX && y == obstacleY ) {
+            return 1;
+        }
+    }
     if (x == obstacleX && y == obstacleY ){
         return 1;
     }else{
@@ -384,7 +495,7 @@ void printBox(int nextX, int nextY, struct element * box, struct element * playe
     if (nextX <= player->x && collisionBox(player->x, player->y, box->x, box->y-2) == 1) {
         printf("🟥");
         if (box->is_dead == 0) {
-            score++;
+            score += 200;
             kills++;
             if (player->lives < 3) {
                 player->lifePiece++;
@@ -441,9 +552,9 @@ void printMessage(int kills) {
 }
 
 void printLives(int lives) {
-    screenGotoxy(MINX + 1, MINY + 4);
+    screenGotoxy(MINX + 1, MINY + 5);
     printf("  Lives: ");
-    screenGotoxy(MINX + 10, MINY + 4);
+    screenGotoxy(MINX + 10, MINY + 5);
 
     for (int i = 1;i < 4; i++){
         printf("%s", (i <=lives) ? "🔵" : "⚫");
@@ -451,10 +562,10 @@ void printLives(int lives) {
 }
 
 void printLifePiece(int lifePiece){
-    screenGotoxy(MINX + 1, MINY + 5);
-    screenSetColor(MAGENTA, DARKGRAY);
+    screenGotoxy(MINX + 1, MINY + 6);
+    screenSetColor(LIGHTMAGENTA, DARKGRAY);
     printf("  Life Pieces: ");
-    screenGotoxy(MINX + 16, MINY + 5);
+    screenGotoxy(MINX + 16, MINY + 6);
     printf("%d / 5", lifePiece);
 }
 
@@ -462,6 +573,23 @@ void boxSpawn (int phase, struct element *box, struct element *player){
     if (phase == 1){
 
         int newBoxX = box->x + box->velX;
+
+        if (score >= 5000) {
+            if (box->side == 1) {
+                    if (frameBox == 0) {
+                        if (newBoxX - 3 > MINX+1) {
+                            newBoxX = newBoxX - 4;
+                        }
+                    }
+            } else {
+                if (frameBox == 0) {
+                    if (newBoxX + 3 < MAXX-2) {
+                        newBoxX = newBoxX + 4;
+                    }
+                }
+            }
+        }
+
         if (newBoxX < MINX + 2)
         {
             screenGotoxy(newBoxX, box->y);
@@ -474,10 +602,26 @@ void boxSpawn (int phase, struct element *box, struct element *player){
             printBox(box->x, box->y, box, player);
         } else {
             printBox(newBoxX, box->y, box, player);
+            if (box->side == 0) {
+                if (frameBox == 8) {
+                    box->side = 1;
+                    frameBox = 0;
+                } else {
+                    frameBox++;
+                }
+            } else {
+                if (frameBox == 8) {
+                    box->side = 0;
+                    frameBox = 0;
+                } else {
+                    frameBox++;
+                }
+            }
         }
-        } else {
-            box->x = box->x + (box->velX)*(-1);
-            if (box->x > 50)
+    } else {
+        box->velX = 1.05;
+        box->x = box->x + box->velX;
+        if (box->x > 50)
         {
             screenGotoxy(box->x, box->y);
             printf("      ");
@@ -488,7 +632,7 @@ void boxSpawn (int phase, struct element *box, struct element *player){
             screenGotoxy(box->x, box->y);
             printBox(box->x, box->y, box, player);
         } else {
-           printBox(box->x, box->y, box, player);
+            printBox(box->x, box->y, box, player);
         }
     }
 }
