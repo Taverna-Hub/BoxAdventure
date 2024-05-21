@@ -99,7 +99,7 @@ int main()
     screenSetColor(CYAN, DARKGRAY);
     screenInit(1);
 
-    timerInit(50);
+    timerInit(40);
 
     struct element * player = createElement();
     player->x = 25;
@@ -375,7 +375,7 @@ int main()
                 }
             }
 
-            if (player->lifePiece == 5){
+            if (player->lifePiece >= 5){
                 player->lives++;
                 player->lifePiece = 0;
             }
@@ -504,7 +504,7 @@ int collisionElement(int x, int y, int obstacleX, int obstacleY){
 }
 
 int collisionBox(int x, int y, int boxX, int boxY){
-    if ((x == boxX || x == boxX+1 || x == boxX-1 || x == boxX+2 || x == boxX-2) && y == boxY ){
+    if ((x == boxX || x == boxX+1 || x == boxX-1 || x == boxX+2 || x == boxX-2) && (y == boxY || y == boxY+1 || y == boxY-1 || y == boxY+2 || y == boxY-2) ){
         return 1;
     }else{
         return 0;
