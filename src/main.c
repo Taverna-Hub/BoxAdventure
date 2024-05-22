@@ -26,6 +26,12 @@ struct element {
     int lifePiece;
 };
 
+struct score {
+    char name[100];
+    int points;
+    struct score *next;
+};
+
 int bossX = 78;
 int velY = 0;
 int score = 0, kills = 0, scoreCounter = 0;
@@ -37,6 +43,11 @@ int lastRound = 0;
 int phase = 1;
 int black = 0;
 int killed = 0;
+
+void addScore(struct score *head, char * name, int points);
+void orderAddList(struct score **head, char * name, int points);
+void saveScore(struct score *head);
+void printLeaderboard(struct score *head);
 
 void groundInit(int y, int stop);
 void physics(int y, struct element * player);
@@ -70,16 +81,6 @@ struct element* createElement() {
     }
 
     return newElement; // Retornar o ponteiro para a estrutura
-}
-
-void saveScore(const char *name, int score) {
-    FILE *file = fopen("scores.txt", "a");
-    if (file == NULL) {
-        printf("Erro ao abrir o arquivo de scores!\n");
-        return;
-    }
-    fprintf(file, "%s %d\n", name, score);
-    fclose(file);
 }
 
 int main()
@@ -437,29 +438,43 @@ int main()
     screenSetColor(YELLOW, DARKGRAY);
     printf("%s\n", leaderboard);
 
+    struct score * head = (struct score *)malloc(sizeof(struct score));
+    head->points = 0;
+    head->next = NULL;
+
+
     FILE *open;
 
     open = fopen("scores.txt", "r");
 
     if (open != NULL) {
-        for (int i = 0; i < 3; i++) {
-            screenSetColor(LIGHTRED, DARKGRAY);
-            screenGotoxy(MINX + 24, MINY + 12 + i);
-            char playerScore[49];
-            fgets(playerScore, 49, open);
-            printf("%s\n", playerScore);
+        while (!feof(open)) {
+            int points;
+            char name[21];
+            fscanf(open,"%s %d", name, &points);
+            orderAddList(&head, name, points);
         }
+    printLeaderboard(head);
+
+        fclose(open);
 
         if (ch == 32) {
-            char name[50];
+            char name[21];
             screenShowCursor();
-            screenSetColor(WHITE, DARKGRAY); 
-            screenGotoxy(MINX + 15, MINY + 18);
+            screenSetColor(CYAN, DARKGRAY);
+            screenGotoxy(MINX + 23, MINY + 17);
+            printf("Your score: ");
+            screenSetColor(YELLOW, DARKGRAY);
+            printf("%d", score);
+            screenSetColor(CYAN, DARKGRAY); 
+            screenGotoxy(MINX + 23, MINY + 18);
             printf("Enter your name: ");
-            scanf("%49s", name); //49s serve de limite de caracters
+            screenSetColor(WHITE, DARKGRAY); 
+            scanf("%21s", name); //21s serve de limite de caracters
 
-            // salva o score e o nome do jogador
-            saveScore(name, score);
+            orderAddList(&head, name, score);
+
+            saveScore(head);
     }
 
     }
@@ -784,4 +799,80 @@ void obstacleSpawn(int phase, struct element *obstacle){
             printObstacle(newObstacleX, obstacle->y, obstacle);
         }
     }
+}
+
+void orderAddList(struct score **head, char * name, int points) {
+    struct score * new;
+    new = (struct score *)malloc(sizeof(struct score));
+    strcpy(new->name, name);
+    new->points = points;
+    new->next = NULL;
+
+    if (*head == NULL) {
+        *head = new;
+    } else if ((*head)->next == NULL) {
+        if ((*head)->points < points) {
+            new->next = *head;
+            *head = new;
+        } else {
+            (*head)->next = new;
+        }
+    } else {
+        struct score * temp = *head;
+        if ((*head)->points < points) {
+            new->next = *head;
+            *head = new;
+        } else {
+            while (temp->next != NULL && temp->next->points > points) {
+                temp = temp->next;
+            }
+            new->next = temp->next;
+            temp->next = new;
+        }
+    }
+}
+
+void printLeaderboard(struct score * head) {
+    struct score * temp = head;
+    for (int i = 0; i < 5; i++) {
+        screenSetColor(CYAN, DARKGRAY);
+        screenGotoxy(51, 12+i);
+        if (i == 0) {
+            printf("🏆 %s - ", temp->name);
+            screenSetColor(YELLOW, DARKGRAY);
+            printf("%d pts\n", temp->points);
+        } else if (i == 1) {
+            printf("🥈 %s - ", temp->name);
+            screenSetColor(YELLOW, DARKGRAY);
+            printf("%d pts\n", temp->points);
+        } else if (i == 2) {
+            printf("🥉 %s - ", temp->name);
+            screenSetColor(YELLOW, DARKGRAY);
+            printf("%d pts\n", temp->points);
+        } else {
+            printf("🏅 %s - ", temp->name);
+            screenSetColor(YELLOW, DARKGRAY);
+            printf("%d pts\n", temp->points);
+        }
+        temp = temp->next;
+    }
+}
+
+void saveScore(struct score *head) {
+    struct score * temp = head;
+    FILE *file = fopen("scores.txt", "w");
+
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo de scores!\n");
+        return;
+    }
+
+    while (temp != NULL) {
+        if (temp->points > 0) {
+            fprintf(file, "%s %d\n", temp->name, temp->points);
+        }
+        temp = temp->next;
+    }
+
+    fclose(file);
 }
