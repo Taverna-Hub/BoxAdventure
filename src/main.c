@@ -72,6 +72,16 @@ struct element* createElement() {
     return newElement; // Retornar o ponteiro para a estrutura
 }
 
+void saveScore(const char *name, int score) {
+    FILE *file = fopen("scores.txt", "a");
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo de scores!\n");
+        return;
+    }
+    fprintf(file, "Nome: %s, Score: %d\n", name, score);
+    fclose(file);
+}
+
 int main()
 {   
     static int ch = 0;
@@ -340,6 +350,16 @@ int main()
 
                     screenSetColor(YELLOW, DARKGRAY);
                     printf("%s\n", end);
+
+                     // solicitar o nome do jogador
+                    char name[50];
+                    screenSetColor(WHITE, DARKGRAY); 
+                    screenGotoxy(MINX + 1, MINY + 4);
+                    printf("Digite seu nome: ");
+                    scanf("%49s", name); //49s serve de limite de caracters
+
+                    // salva o score e o nome do jogador
+                    saveScore(name, score);
 
                     while (ch != 10) {
                         if (ch = keyhit())
