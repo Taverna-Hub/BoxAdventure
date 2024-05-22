@@ -15,6 +15,7 @@
 #include "./ascii.h"
 
 #define KILLS_LIMIT 30
+
 struct element {
     int x;
     int y;
@@ -31,6 +32,15 @@ struct score {
     int points;
     struct score *next;
 };
+
+/* void printLinkedList(struct score* head) {
+    struct score* temp = head;
+    printf("Lista de pontuações:\n");
+    while (temp != NULL) {
+        printf("Nome: %s, Pontuação: %d\n", temp->name, temp->points);
+        temp = temp->next;
+    }
+} */
 
 int bossX = 78;
 int velY = 0;
@@ -412,10 +422,6 @@ int main()
                     bossX--;
                 }
 
-                /* for (int i = 0; i < 5; i++) {
-                    screenGotoxy(25, 19-i);
-                    printf(" ");
-                } */
             }
 
             screenUpdate();
@@ -442,6 +448,7 @@ int main()
     printf("%s\n", leaderboard);
 
     struct score * head = (struct score *)malloc(sizeof(struct score));
+    strcpy(head->name, "head");
     head->points = 0;
     head->next = NULL;
 
@@ -454,12 +461,15 @@ int main()
             int points;
             char name[21];
             fscanf(open,"%s %d", name, &points);
-            orderAddList(&head, name, points);
+            if (strcmp(name, "") != 0) {
+                orderAddList(&head, name, points);
+            }
         }
 
     fclose(open);
     printLeaderboard(head);
 
+    /* printLinkedList(head); */
 
     if (ch == 32) {
         char nameTemp[21];
