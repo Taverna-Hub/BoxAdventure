@@ -43,6 +43,7 @@ int lastRound = 0;
 int phase = 1;
 int black = 0;
 int killed = 0;
+int invulFrames = 0;
 
 void addScore(struct score *head, char * name, int points);
 void orderAddList(struct score **head, char * name, int points);
@@ -294,8 +295,9 @@ int main()
                         }
                     }
                     break;
-                } else {
+                } else if (player->lives > 0 && invulFrames == 0){
                     player->lives--;
+                    invulFrames = 40;
                 }
             }
             }
@@ -328,8 +330,9 @@ int main()
                         }
                     }
                     break;
-                } else {
+                } else if (player->lives > 0 && invulFrames == 0){
                     player->lives--;
+                    invulFrames = 40;
                 }
             }
             }
@@ -366,8 +369,9 @@ int main()
                         }
                     }
                     break;
-                } else {
+                } else if (player->lives > 0 && invulFrames == 0){
                     player->lives--;
+                    invulFrames = 40;
                 }
             }
 
@@ -416,6 +420,10 @@ int main()
                     screenGotoxy(25, 19-i);
                     printf(" ");
                 } */
+            }
+
+            if (invulFrames > 0){
+                invulFrames--;
             }
 
             screenUpdate();
