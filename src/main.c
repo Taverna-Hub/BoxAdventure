@@ -78,7 +78,7 @@ void saveScore(const char *name, int score) {
         printf("Erro ao abrir o arquivo de scores!\n");
         return;
     }
-    fprintf(file, "Nome: %s, Score: %d\n", name, score);
+    fprintf(file, "%s %d\n", name, score);
     fclose(file);
 }
 
@@ -317,6 +317,7 @@ int main()
                     printf("%s\n", end);
 
                     while (ch != 10) {
+                        screenUpdate();
                         if (ch = keyhit())
                         {
                             break;
@@ -349,24 +350,17 @@ int main()
                     printf("%s\n", gameOver);
 
                     screenSetColor(YELLOW, DARKGRAY);
-                    printf("%s\n", end);
+                    printf("%s\n\n\n", end);
 
-                     // solicitar o nome do jogador
-                    char name[50];
-                    screenSetColor(WHITE, DARKGRAY); 
-                    screenGotoxy(MINX + 1, MINY + 4);
-                    printf("Digite seu nome: ");
-                    scanf("%49s", name); //49s serve de limite de caracters
+                    screenSetColor(YELLOW, DARKGRAY);
+                    printf("%s\n", endScore);
 
-                    // salva o score e o nome do jogador
-                    saveScore(name, score);
-
-                    while (ch != 10) {
-                        if (ch = keyhit())
+                    while (ch != 10 && ch != 32) {
+                        if (keyhit())
                         {
-                            break;
+                            ch = readch();
                         }
-                    }    
+                    }
                     break;
                 } else {
                     player->lives--;
@@ -422,7 +416,7 @@ int main()
 
             screenUpdate();
         }
-    } 
+    }
 
     free(player);
 
@@ -437,6 +431,39 @@ int main()
     keyboardDestroy();
     screenDestroy();
     timerDestroy();
+
+    screenInit(0);
+
+    screenSetColor(YELLOW, DARKGRAY);
+    printf("%s\n", leaderboard);
+
+    FILE *open;
+
+    open = fopen("scores.txt", "r");
+
+    if (open != NULL) {
+        for (int i = 0; i < 3; i++) {
+            screenSetColor(LIGHTRED, DARKGRAY);
+            screenGotoxy(MINX + 24, MINY + 12 + i);
+            char playerScore[49];
+            fgets(playerScore, 49, open);
+            printf("%s\n", playerScore);
+        }
+
+        if (ch == 32) {
+            char name[50];
+            screenShowCursor();
+            screenSetColor(WHITE, DARKGRAY); 
+            screenGotoxy(MINX + 15, MINY + 18);
+            printf("Enter your name: ");
+            scanf("%49s", name); //49s serve de limite de caracters
+
+            // salva o score e o nome do jogador
+            saveScore(name, score);
+    }
+
+    }
+    screenDestroy();
 
     return 0;
 }
