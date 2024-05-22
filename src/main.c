@@ -156,23 +156,27 @@ int main()
     {
         if (score >= 10000) {
             if (phase > 1) {
-                box[0]->velX = 2;
+                box[0]->velX = 1.05;
                 obstacle[0]->velX = 2;
-                obstacle[1]->velX = 2;
+                obstacle[1]->velX = 1;
+                obstacle[2]->velX = 1;
             } else {
                 box[0]->velX = -2;
                 obstacle[0]->velX = -2;
                 obstacle[1]->velX = -2;
+                obstacle[2]->velX = -1;
             }
         } else if (score >= 5000) {
             if (phase > 1) {
                 box[0]->velX = 1.05;
                 obstacle[0]->velX = 1.05;
                 obstacle[1]->velX = 1.05;
+                obstacle[2]->velX = 1;
             } else {
                 box[0]->velX = -1.05;
                 obstacle[0]->velX = -1.05;
                 obstacle[1]->velX = -1.05;
+                obstacle[2]->velX = -1;
             }
         } 
 
@@ -283,12 +287,12 @@ int main()
                     screenSetColor(YELLOW, DARKGRAY);
                     printf("%s\n", end);
 
-                    while (ch != 10) {
-                        if (ch = keyhit())
+                    while (ch != 10 && ch != 32) {
+                        if (keyhit())
                         {
-                            break;
+                            ch = readch();
                         }
-                    }    
+                    }
                     break;
                 } else {
                     player->lives--;
@@ -317,13 +321,12 @@ int main()
                     screenSetColor(YELLOW, DARKGRAY);
                     printf("%s\n", end);
 
-                    while (ch != 10) {
-                        screenUpdate();
-                        if (ch = keyhit())
+                    while (ch != 10 && ch != 32) {
+                        if (keyhit())
                         {
-                            break;
+                            ch = readch();
                         }
-                    }    
+                    }
                     break;
                 } else {
                     player->lives--;
