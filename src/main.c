@@ -27,7 +27,7 @@ struct element {
 };
 
 struct score {
-    char name[100];
+    char name[21];
     int points;
     struct score *next;
 };
@@ -445,10 +445,9 @@ int main()
     head->points = 0;
     head->next = NULL;
 
-
     FILE *open;
 
-    open = fopen("scores.txt", "r");
+    open = fopen("./scores.txt", "r");
 
     if (open != NULL) {
         while (!feof(open)) {
@@ -457,31 +456,35 @@ int main()
             fscanf(open,"%s %d", name, &points);
             orderAddList(&head, name, points);
         }
+
+    fclose(open);
     printLeaderboard(head);
 
-        fclose(open);
 
-        if (ch == 32) {
-            char name[21];
-            screenShowCursor();
-            screenSetColor(CYAN, DARKGRAY);
-            screenGotoxy(MINX + 23, MINY + 17);
-            printf("Your score: ");
-            screenSetColor(YELLOW, DARKGRAY);
-            printf("%d", score);
-            screenSetColor(CYAN, DARKGRAY); 
-            screenGotoxy(MINX + 23, MINY + 18);
-            printf("Enter your name: ");
-            screenSetColor(WHITE, DARKGRAY); 
-            scanf("%21s", name); //21s serve de limite de caracters
+    if (ch == 32) {
+        char nameTemp[21];
+        screenShowCursor();
+        screenSetColor(CYAN, DARKGRAY);
+        screenGotoxy(MINX + 23, MINY + 17);
+        printf("Your score: ");
+        screenSetColor(YELLOW, DARKGRAY);
+        printf("%d", score);
+        screenSetColor(CYAN, DARKGRAY); 
+        screenGotoxy(MINX + 23, MINY + 18);
+        printf("Enter your name: ");
+        screenSetColor(WHITE, DARKGRAY); 
+        scanf("%21s", nameTemp); //21s serve de limite de caracters
 
-            orderAddList(&head, name, score);
+        orderAddList(&head, nameTemp, score);
 
-            saveScore(head);
+        saveScore(head);
     }
-
+    } else {
+        printf("deu ruim");
     }
     screenDestroy();
+
+    free(head);
 
     return 0;
 }
@@ -837,33 +840,44 @@ void orderAddList(struct score **head, char * name, int points) {
 
 void printLeaderboard(struct score * head) {
     struct score * temp = head;
+    int added = 0;
     for (int i = 0; i < 5; i++) {
         screenSetColor(CYAN, DARKGRAY);
-        screenGotoxy(51, 12+i);
-        if (i == 0) {
-            printf("🏆 %s - ", temp->name);
-            screenSetColor(YELLOW, DARKGRAY);
-            printf("%d pts\n", temp->points);
-        } else if (i == 1) {
-            printf("🥈 %s - ", temp->name);
-            screenSetColor(YELLOW, DARKGRAY);
-            printf("%d pts\n", temp->points);
-        } else if (i == 2) {
-            printf("🥉 %s - ", temp->name);
-            screenSetColor(YELLOW, DARKGRAY);
-            printf("%d pts\n", temp->points);
-        } else {
-            printf("🏅 %s - ", temp->name);
-            screenSetColor(YELLOW, DARKGRAY);
-            printf("%d pts\n", temp->points);
+        screenGotoxy(49, 12+i);
+        if (temp->points > 0) {
+            if (i == 0) {
+                printf("🏆 %s - ", temp->name);
+                screenSetColor(YELLOW, DARKGRAY);
+                printf("%d pts\n", temp->points);
+                added += 1;
+            } else if (i == 1) {
+                printf("🥈 %s - ", temp->name);
+                screenSetColor(YELLOW, DARKGRAY);
+                printf("%d pts\n", temp->points);
+            } else if (i == 2) {
+                printf("🥉 %s - ", temp->name);
+                screenSetColor(YELLOW, DARKGRAY);
+                printf("%d pts\n", temp->points);
+            } else {
+                printf("🏅 %s - ", temp->name);
+                screenSetColor(YELLOW, DARKGRAY);
+                printf("%d pts\n", temp->points);
+            }
         }
         temp = temp->next;
+        if (temp == NULL) {
+            break;
+        }
+    }
+    if (added == 0) {
+        screenSetColor(CYAN, DARKGRAY);
+        printf("No records recorded\n");
     }
 }
 
 void saveScore(struct score *head) {
     struct score * temp = head;
-    FILE *file = fopen("scores.txt", "w");
+    FILE *file = fopen("./scores.txt", "w");
 
     if (file == NULL) {
         printf("Erro ao abrir o arquivo de scores!\n");
