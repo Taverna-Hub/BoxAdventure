@@ -477,7 +477,7 @@ int main()
         screenGotoxy(MINX + 23, MINY + 18);
         printf("Enter your name: ");
         screenSetColor(WHITE, DARKGRAY); 
-        scanf("%21s", nameTemp); //21s serve de limite de caracters
+        scanf(" %20[^\n]s", nameTemp); //21s serve de limite de caracters
 
         orderAddList(&head, nameTemp, score);
 
