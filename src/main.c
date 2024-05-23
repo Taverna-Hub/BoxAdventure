@@ -504,6 +504,8 @@ int main()
     }
 
     screenDestroy();
+    keyboardDestroy();
+    timerDestroy();
 
     free(head);
 
