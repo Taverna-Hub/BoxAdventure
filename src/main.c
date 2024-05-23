@@ -15,6 +15,7 @@
 #include "./ascii.h"
 
 #define KILLS_LIMIT 30
+
 struct element {
     int x;
     int y;
@@ -416,10 +417,6 @@ int main()
                     bossX--;
                 }
 
-                /* for (int i = 0; i < 5; i++) {
-                    screenGotoxy(25, 19-i);
-                    printf(" ");
-                } */
             }
 
             if (invulFrames > 0){
@@ -450,6 +447,7 @@ int main()
     printf("%s\n", leaderboard);
 
     struct score * head = (struct score *)malloc(sizeof(struct score));
+    strcpy(head->name, "head");
     head->points = 0;
     head->next = NULL;
 
@@ -458,16 +456,14 @@ int main()
     open = fopen("./scores.txt", "r");
 
     if (open != NULL) {
-        while (!feof(open)) {
-            int points;
-            char name[21];
-            fscanf(open,"%s %d", name, &points);
+        int points;
+        char name[21];
+        while (fscanf(open, "%21s %d", name, &points) == 2) {
             orderAddList(&head, name, points);
         }
 
     fclose(open);
     printLeaderboard(head);
-
 
     if (ch == 32) {
         char nameTemp[21];
@@ -486,10 +482,26 @@ int main()
         orderAddList(&head, nameTemp, score);
 
         saveScore(head);
+
+        screenInit(0);
+
+        screenSetColor(YELLOW, DARKGRAY);
+        printf("%s\n", leaderboard);
+
+        printLeaderboard(head);
+
+        screenSetColor(YELLOW, DARKGRAY);
+        printf("\n\n\n\n\n‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ %s\n", end);
+
+        while (ch != 10) {
+            if (keyhit())
+            {
+                ch = readch();
+            }
+        }
     }
-    } else {
-        printf("deu ruim");
     }
+
     screenDestroy();
 
     free(head);
@@ -836,6 +848,8 @@ void orderAddList(struct score **head, char * name, int points) {
         if ((*head)->points < points) {
             new->next = *head;
             *head = new;
+            printf("quarto\n");
+            sleep(1);
         } else {
             while (temp->next != NULL && temp->next->points > points) {
                 temp = temp->next;
@@ -885,7 +899,7 @@ void printLeaderboard(struct score * head) {
 
 void saveScore(struct score *head) {
     struct score * temp = head;
-    FILE *file = fopen("./scores.txt", "w");
+    FILE *file = fopen("scores.txt", "w");
 
     if (file == NULL) {
         printf("Erro ao abrir o arquivo de scores!\n");
@@ -893,6 +907,9 @@ void saveScore(struct score *head) {
     }
 
     while (temp != NULL) {
+        if (temp == NULL) {
+            break;
+        }
         if (temp->points > 0) {
             fprintf(file, "%s %d\n", temp->name, temp->points);
         }
