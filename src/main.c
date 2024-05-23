@@ -167,12 +167,14 @@ int main()
 
         screenSetColor(CYAN, DARKGRAY);
         screenGotoxy(40, 12);
-        printf("Dodge the enemies: 🔥\n\n");
+        printf("Press [ SPACE ] to jump: 🔵\n\n");
         screenGotoxy(40, 14);
+        printf("Dodge the enemies: 🔥\n\n");
+        screenGotoxy(40, 16);
         printf("Kill boxes to get life pieces: ⬜ -> 🟥 -> ");
         screenSetColor(MAGENTA, DARKGRAY);
         printf("1 / 5");
-        screenGotoxy(40, 16);
+        screenGotoxy(40, 18);
         screenSetColor(CYAN, DARKGRAY);
         printf("Gather 5 life pieces to obtain 1 life point: 🔵🔵⚫\n\n");
 
