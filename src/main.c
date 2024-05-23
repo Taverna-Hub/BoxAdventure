@@ -33,15 +33,6 @@ struct score {
     struct score *next;
 };
 
-/* void printLinkedList(struct score* head) {
-    struct score* temp = head;
-    printf("Lista de pontuações:\n");
-    while (temp != NULL) {
-        printf("Nome: %s, Pontuação: %d\n", temp->name, temp->points);
-        temp = temp->next;
-    }
-} */
-
 int bossX = 78;
 int velY = 0;
 int score = 0, kills = 0, scoreCounter = 0;
@@ -457,19 +448,14 @@ int main()
     open = fopen("./scores.txt", "r");
 
     if (open != NULL) {
-        while (!feof(open)) {
-            int points;
-            char name[21];
-            fscanf(open,"%s %d", name, &points);
-            if (strcmp(name, "") != 0) {
-                orderAddList(&head, name, points);
-            }
+        int points;
+        char name[21];
+        while (fscanf(open, "%21s %d", name, &points) == 2) {
+            orderAddList(&head, name, points);
         }
 
     fclose(open);
     printLeaderboard(head);
-
-    /* printLinkedList(head); */
 
     if (ch == 32) {
         char nameTemp[21];
@@ -488,10 +474,26 @@ int main()
         orderAddList(&head, nameTemp, score);
 
         saveScore(head);
+
+        screenInit(0);
+
+        screenSetColor(YELLOW, DARKGRAY);
+        printf("%s\n", leaderboard);
+
+        printLeaderboard(head);
+
+        screenSetColor(YELLOW, DARKGRAY);
+        printf("\n\n\n\n\n‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ %s\n", end);
+
+        while (ch != 10) {
+            if (keyhit())
+            {
+                ch = readch();
+            }
+        }
     }
-    } else {
-        printf("deu ruim");
     }
+
     screenDestroy();
 
     free(head);
@@ -838,6 +840,8 @@ void orderAddList(struct score **head, char * name, int points) {
         if ((*head)->points < points) {
             new->next = *head;
             *head = new;
+            printf("quarto\n");
+            sleep(1);
         } else {
             while (temp->next != NULL && temp->next->points > points) {
                 temp = temp->next;
@@ -887,7 +891,7 @@ void printLeaderboard(struct score * head) {
 
 void saveScore(struct score *head) {
     struct score * temp = head;
-    FILE *file = fopen("./scores.txt", "w");
+    FILE *file = fopen("scores.txt", "w");
 
     if (file == NULL) {
         printf("Erro ao abrir o arquivo de scores!\n");
@@ -895,6 +899,9 @@ void saveScore(struct score *head) {
     }
 
     while (temp != NULL) {
+        if (temp == NULL) {
+            break;
+        }
         if (temp->points > 0) {
             fprintf(file, "%s %d\n", temp->name, temp->points);
         }
