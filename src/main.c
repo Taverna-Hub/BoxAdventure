@@ -30,6 +30,7 @@ struct element {
 struct score {
     char name[21];
     int points;
+    int scoreKills;
     struct score *next;
 };
 
@@ -45,9 +46,10 @@ int phase = 1;
 int black = 0;
 int killed = 0;
 int invulFrames = 0;
+int menuLeadBoard = 0;
+int menuInstructions = 0;
 
-void addScore(struct score *head, char * name, int points);
-void orderAddList(struct score **head, char * name, int points);
+void orderAddList(struct score **head, char * name, int points, int kills);
 void saveScore(struct score *head);
 void printLeaderboard(struct score *head);
 
@@ -98,16 +100,91 @@ int main()
     system("clear");
     screenSetColor(CYAN, DARKGRAY);
     printf("%s\n", logo);
+
     screenSetColor(YELLOW, DARKGRAY);
-    printf("%s\n", start);
+    printf("%s\n\n", start);
+    screenSetColor(YELLOW, DARKGRAY);
+    printf("%s\n\n", openLeaderboard);
+    screenSetColor(YELLOW, DARKGRAY);
+    printf("%s\n", instructions);
 
     while (ch != 32) {
         if (keyhit())
         {
             ch = readch();
         }
+        if (ch == 73 || ch == 105) {
+            menuInstructions = 1;
+            break;
+        }
+        if(ch == 76 || ch == 108) {
+            menuLeadBoard = 1;
+            break;
+        }
     }
+
     ch = 0;
+
+    if (menuLeadBoard) {
+        screenInit(0);
+        screenSetColor(YELLOW, DARKGRAY);
+        printf("%s\n", leaderboard);
+        struct score * head = (struct score *)malloc(sizeof(struct score));
+        strcpy(head->name, "head");
+        head->points = 0;
+        head->scoreKills = 0;
+        head->next = NULL;
+
+        FILE *open;
+
+        open = fopen("./scores.txt", "r");
+
+        if (open != NULL) {
+            int points;
+            char name[21];
+            int tempKills;
+            while (fscanf(open, "%21s %d %d", name, &points, &tempKills) == 3) {
+                orderAddList(&head, name, points, tempKills);
+            }
+
+        fclose(open);
+        printLeaderboard(head);
+        screenSetColor(YELLOW, DARKGRAY);
+        printf("\n\n          %s\n\n", start);
+        while (ch != 32) {
+            if (keyhit()) {
+                ch = readch();
+            }
+        }
+        }
+        free(head);
+    }
+
+    if (menuInstructions) {
+        screenInit(0);
+        screenSetColor(BLUE, DARKGRAY);
+        printf("%s\n", instructionsAscii);
+
+        screenSetColor(CYAN, DARKGRAY);
+        screenGotoxy(40, 12);
+        printf("Dodge the enemies: 🔥\n\n");
+        screenGotoxy(40, 14);
+        printf("Kill boxes to get life pieces: ⬜ -> 🟥 -> ");
+        screenSetColor(MAGENTA, DARKGRAY);
+        printf("1 / 5");
+        screenGotoxy(40, 16);
+        screenSetColor(CYAN, DARKGRAY);
+        printf("Gather 5 life pieces to obtain 1 life point: 🔵🔵⚫\n\n");
+
+        screenSetColor(YELLOW, DARKGRAY);
+        printf("\n\n          %s\n\n", start);
+        while (ch != 32) {
+            if (keyhit()) {
+                ch = readch();
+            }
+        }
+    }
+
 
     screenSetColor(CYAN, DARKGRAY);
     screenInit(1);
@@ -298,7 +375,7 @@ int main()
                     break;
                 } else if (player->lives > 0 && invulFrames == 0){
                     player->lives--;
-                    invulFrames = 40;
+                    invulFrames = 60;
                 }
             }
             }
@@ -333,7 +410,7 @@ int main()
                     break;
                 } else if (player->lives > 0 && invulFrames == 0){
                     player->lives--;
-                    invulFrames = 40;
+                    invulFrames = 60;
                 }
             }
             }
@@ -372,7 +449,7 @@ int main()
                     break;
                 } else if (player->lives > 0 && invulFrames == 0){
                     player->lives--;
-                    invulFrames = 40;
+                    invulFrames = 60;
                 }
             }
 
@@ -446,10 +523,11 @@ int main()
     screenSetColor(YELLOW, DARKGRAY);
     printf("%s\n", leaderboard);
 
-    struct score * head = (struct score *)malloc(sizeof(struct score));
-    strcpy(head->name, "head");
-    head->points = 0;
-    head->next = NULL;
+    struct score * head2 = (struct score *)malloc(sizeof(struct score));
+    strcpy(head2->name, "head2");
+    head2->points = 0;
+    head2->scoreKills = 0;
+    head2->next = NULL;
 
     FILE *open;
 
@@ -458,12 +536,13 @@ int main()
     if (open != NULL) {
         int points;
         char name[21];
-        while (fscanf(open, "%21s %d", name, &points) == 2) {
-            orderAddList(&head, name, points);
+        int tempKills;
+        while (fscanf(open, "%21s %d %d", name, &points, &tempKills) == 3) {
+            orderAddList(&head2, name, points, tempKills);
         }
 
     fclose(open);
-    printLeaderboard(head);
+    printLeaderboard(head2);
 
     if (ch == 32) {
         char nameTemp[21];
@@ -479,16 +558,16 @@ int main()
         screenSetColor(WHITE, DARKGRAY); 
         scanf(" %20[^\n]s", nameTemp); //21s serve de limite de caracters
 
-        orderAddList(&head, nameTemp, score);
+        orderAddList(&head2, nameTemp, score, kills);
 
-        saveScore(head);
+        saveScore(head2);
 
         screenInit(0);
 
         screenSetColor(YELLOW, DARKGRAY);
         printf("%s\n", leaderboard);
 
-        printLeaderboard(head);
+        printLeaderboard(head2);
 
         screenSetColor(YELLOW, DARKGRAY);
         printf("\n\n\n\n\n‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ %s\n", end);
@@ -507,7 +586,7 @@ int main()
     keyboardDestroy();
     timerDestroy();
 
-    free(head);
+    free(head2);
 
     return 0;
 }
@@ -627,7 +706,7 @@ void printBox(int nextX, int nextY, struct element * box, struct element * playe
         if (box->is_dead != 1 && kills < 1) {
             screenGotoxy(box->x, box->y-2);
             screenSetColor(GREEN, DARKGRAY);
-            printf("v");
+            printf("▼");
         }
 
         screenGotoxy(box->x, box->y);
@@ -786,7 +865,6 @@ void boxSpawn (int phase, struct element *box, struct element *player){
                 if (frameBox == 8) {
                     box->side = 1;
                     frameBox = 0;
-                } else {
                     frameBox++;
                 }
             } else {
@@ -830,12 +908,13 @@ void obstacleSpawn(int phase, struct element *obstacle){
     }
 }
 
-void orderAddList(struct score **head, char * name, int points) {
+void orderAddList(struct score **head, char * name, int points, int kills) {
     struct score * new;
     new = (struct score *)malloc(sizeof(struct score));
     strcpy(new->name, name);
     new->points = points;
     new->next = NULL;
+    new->scoreKills = kills;
 
     if (*head == NULL) {
         *head = new;
@@ -871,20 +950,36 @@ void printLeaderboard(struct score * head) {
             if (i == 0) {
                 printf("🏆 %s - ", temp->name);
                 screenSetColor(YELLOW, DARKGRAY);
-                printf("%d pts\n", temp->points);
+                printf("%d pts", temp->points);
                 added += 1;
+                if (temp->scoreKills == 0) {
+                    printf(" 🕊️");
+                }
+                printf("\n");
             } else if (i == 1) {
                 printf("🥈 %s - ", temp->name);
                 screenSetColor(YELLOW, DARKGRAY);
-                printf("%d pts\n", temp->points);
+                printf("%d pts", temp->points);
+                if (temp->scoreKills == 0) {
+                    printf(" 🕊️");
+                }
+                printf("\n");
             } else if (i == 2) {
                 printf("🥉 %s - ", temp->name);
                 screenSetColor(YELLOW, DARKGRAY);
-                printf("%d pts\n", temp->points);
+                printf("%d pts", temp->points);
+                if (temp->scoreKills == 0) {
+                    printf(" 🕊️");
+                }
+                printf("\n");
             } else {
                 printf("🏅 %s - ", temp->name);
                 screenSetColor(YELLOW, DARKGRAY);
-                printf("%d pts\n", temp->points);
+                printf("%d pts", temp->points);
+                if (temp->scoreKills == 0) {
+                    printf(" 🕊️");
+                }
+                printf("\n");
             }
         }
         temp = temp->next;
@@ -912,7 +1007,7 @@ void saveScore(struct score *head) {
             break;
         }
         if (temp->points > 0) {
-            fprintf(file, "%s %d\n", temp->name, temp->points);
+            fprintf(file, "%s %d %d\n", temp->name, temp->points, temp->scoreKills);
         }
         temp = temp->next;
     }
