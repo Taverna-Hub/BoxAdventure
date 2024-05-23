@@ -14,7 +14,7 @@
 #include "timer.h"
 #include "./ascii.h"
 
-#define KILLS_LIMIT 30
+#define KILLS_LIMIT 35
 
 struct element {
     int x;
@@ -165,7 +165,7 @@ int main()
             } else {
                 box[0]->velX = -2;
                 obstacle[0]->velX = -2;
-                obstacle[1]->velX = -2;
+                obstacle[1]->velX = -1;
                 obstacle[2]->velX = -1;
             }
         } else if (score >= 5000) {
@@ -499,6 +499,7 @@ int main()
                 ch = readch();
             }
         }
+        ch = 0;
     }
     }
 
@@ -654,7 +655,7 @@ void printMessage(int kills, int black) {
     } else {
         printf("                              ");
     }
-    if (kills >= 1 && kills <= 3) {
+    if (kills >= 1 && kills <= 4) {
         screenGotoxy(MINX+18, MINY+10);
         screenSetColor(RED, DARKGRAY);
         printf("What have you done? You just killed him");
@@ -664,7 +665,7 @@ void printMessage(int kills, int black) {
         screenSetColor(RED, DARKGRAY);
         printf("Stop that, you murderer");
         screenSetColor(CYAN, DARKGRAY);
-    } else if (kills >= 25 && kills <= 27) {
+    } else if (kills >= 30 && kills <= 32) {
         screenGotoxy(MINX+30, MINY+10);
         screenSetColor(RED, DARKGRAY);
         printf("I warned you");
@@ -848,8 +849,6 @@ void orderAddList(struct score **head, char * name, int points) {
         if ((*head)->points < points) {
             new->next = *head;
             *head = new;
-            printf("quarto\n");
-            sleep(1);
         } else {
             while (temp->next != NULL && temp->next->points > points) {
                 temp = temp->next;
