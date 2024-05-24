@@ -42,7 +42,7 @@ O jogo possui 3 "personagens" principais:
 - A box: ⬜
 
 ## Os Inimigos
-A mecânica é simples, se o 🔵 encostar no 🔥 e o jogador estiver com apenas 1 vida, o jogo acaba.
+A mecânica é simples, se o 🔵 encostar no 🔥 e o jogador estiver com apenas 1 <b>Ponto de Vida</b>, o jogo acaba.
 
 Para evitar que isso aconteça, o jogador deve apertar <b>[ ESPAÇO ]</b> para pular por cima do inimigo. 
 
