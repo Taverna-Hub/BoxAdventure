@@ -1,10 +1,8 @@
 ![bannerboxadventure](https://github.com/Taverna-Hub/BoxAdventure/assets/117609505/daad1520-c5a6-401f-8cba-63c8037826b7)
 
-<br>
-
 <p align="center"><b>BoxAdventure</b> é um runner game onde o jogador precisa desviar dos inimigos enquanto sacrifica "boxes" para ganhar pontos de vida.</p>
 
-<br>
+---
 
 # ⚙️ Como rodar:
 
