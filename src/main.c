@@ -249,7 +249,7 @@ int main()
             }
         } else if (score >= 5000) {
             if (phase > 1) {
-                box[0]->velX = 1.05;
+                box[0]->velX = 1.5;
                 obstacle[0]->velX = 1.05;
                 obstacle[1]->velX = 1.05;
                 obstacle[2]->velX = 1;
@@ -537,9 +537,9 @@ int main()
 
     if (open != NULL) {
         int points;
-        char name[21];
+        char name[11];
         int tempKills;
-        while (fscanf(open, "%21s %d %d", name, &points, &tempKills) == 3) {
+        while (fscanf(open, "%11s %d %d", name, &points, &tempKills) == 3) {
             orderAddList(&head2, name, points, tempKills);
         }
 
@@ -776,11 +776,16 @@ void printLives(int lives) {
 }
 
 void printLifePiece(int lifePiece){
-    screenGotoxy(MINX + 1, MINY + 6);
-    screenSetColor(LIGHTMAGENTA, DARKGRAY);
-    printf("  Life Pieces: ");
-    screenGotoxy(MINX + 16, MINY + 6);
-    printf("%d / 5", lifePiece);
+    if (phase == 1){
+        screenGotoxy(MINX + 1, MINY + 6);
+        screenSetColor(LIGHTMAGENTA, DARKGRAY);
+        printf("  Life Pieces: ");
+        screenGotoxy(MINX + 16, MINY + 6);
+        printf("%d / 5", lifePiece);
+    } else {
+        screenGotoxy(MINX + 1, MINY + 6);
+        printf("                ");
+    }
 }
 
 void boxSpawn (int phase, struct element *box, struct element *player){
@@ -788,7 +793,7 @@ void boxSpawn (int phase, struct element *box, struct element *player){
 
         int newBoxX = box->x + box->velX;
 
-        if (score >= 10000) {
+        if (score >= 5000) {
             if (box->side == 1) {
                     if (frameBox == 0) {
                         if (newBoxX - 3 > MINX+1) {
@@ -833,52 +838,8 @@ void boxSpawn (int phase, struct element *box, struct element *player){
             }
         }
     } else {
-        int newBoxX = box->x + box->velX;
-
-        if (score >= 10000) {
-            if (box->side == 1) {
-                    if (frameBox == 0) {
-                        if (newBoxX + 3 > MINX-1) {
-                            newBoxX = newBoxX + 4;
-                        }
-                    }
-            } else {
-                if (frameBox == 0) {
-                    if (newBoxX - 3 < MAXX+2) {
-                        newBoxX = newBoxX - 4;
-                    }
-                }
-            }
-        }
-
-        if (newBoxX > 50)
-        {
-            screenGotoxy(box->x, box->y);
-            printf("      ");
-            screenGotoxy(box->x, box->y-2);
-            printf("      ");
-            box->x = 2;
-            box->is_dead = 0;
-            screenGotoxy(box->x, box->y);
-            printBox(box->x, box->y, box, player);
-        } else {
-            printBox(newBoxX, box->y, box, player);
-            if (box->side == 0) {
-                if (frameBox == 8) {
-                    box->side = 1;
-                    frameBox = 0;
-                    frameBox++;
-                }
-            } else {
-                if (frameBox == 8) {
-                    box->side = 0;
-                    frameBox = 0;
-                } else {
-                    frameBox++;
-                }
-            }
-
-        }
+        screenGotoxy(box->x, box->y);
+        printf("      ");
     }
 }
 
